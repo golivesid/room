@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Expense Tracker</title>
+    <style>
+        :root {
+            --primary: #4a6fa5;
+            --secondary: #166d3b;
+            --light: #f5f5f5;
+            --dark: #333;
+            --danger: #e74c3c;
+            --success: #27ae60;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f8f9fa;
+            color: var(--dark);
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .header {
+            background-color: var(--primary);
+            color: white;
+            padding: 20px 0;
+            text-align: center;
+            border-radius: 8px 8px 0 0;
+            margin-bottom: 20px;
+        }
+        
+        .auth-section {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .expense-form {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .expense-list {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+        }
+        
+        .summary {
+            background-color: var(--primary);
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+        
+        .btn {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+        }
+        
+        .btn-secondary {
+            background-color: var(--secondary);
+            color: white;
+        }
+        
+        .btn-danger {
+            background-color: var(--danger);
+            color: white;
+        }
+        
+        .btn:hover {
+            opacity: 0.9;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        table th, table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        table th {
+            background-color: #f2f2f2;
+            font-weight: 600;
+        }
+        
+        .expense-item:hover {
+            background-color: #f9f9f9;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 5px;
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        .user-welcome {
+            background-color: var(--secondary);
+            color: white;
+            padding: 10px;
+            border-radius: 4px;
+            margin-bottom: 15px;
+        }
+        
+        .total-amount {
+            font-size: 24px;
+            font-weight: bold;
+        }
+        
+        .alert {
+            padding: 10px;
+            border-radius: 4px;
+            margin-bottom: 15px;
+        }
+        
+        .alert-success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .alert-danger {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            
+            .summary {
+                flex-direction: column;
+            }
+            
+            table th, table td {
+                padding: 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Expense Tracker</h1>
+            <p>Manage your expenses and track your remaining budget</p>
+        </div>
+        
+        <div id="alert-container"></div>
+        
+        <!-- Authentication Section -->
+        <div id="auth-section" class="auth-section">
+            <h2>Sign In</h2>
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" id="email" class="form-control" placeholder="Enter your email">
+            </div>
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" class="form-control" placeholder="Enter your password">
+            </div>
+            <div style="display: flex; gap: 10px;">
+                <button id="login-btn" class="btn btn-primary">Login</button>
+                <button id="signup-btn" class="btn btn-secondary">Sign Up</button>
+            </div>
+        </div>
+        
+        <!-- Main App Content (Hidden until logged in) -->
+        <div id="app-content" class="hidden">
+            <div id="user-welcome" class="user-welcome">
+                Welcome, <span id="username-display">User</span>!
+                <button id="logout-btn" class="btn btn-danger" style="float: right; padding: 5px 10px; font-size: 14px;">Logout</button>
+            </div>
+            
+            <div class="summary">
+                <div>
+                    <h3>Total Budget</h3>
+                    <div class="total-amount" id="total-budget">$0.00</div>
+                </div>
+                <div>
+                    <h3>Total Expenses</h3>
+                    <div class="total-amount" id="total-expenses">$0.00</div>
+                </div>
+                <div>
+                    <h3>Remaining Amount</h3>
+                    <div class="total-amount" id="remaining-amount">$0.00</div>
+                </div>
+            </div>
+            
+            <div class="expense-form">
+                <h2>Add New Expense</h2>
+                <div class="form-group">
+                    <label for="expense-name">Expense Name</label>
+                    <input type="text" id="expense-name" class="form-control" placeholder="Enter expense name">
+                </div>
+                <div class="form-group">
+                    <label for="expense-amount">Amount</label>
+                    <input type="number" id="expense-amount" class="form-control" placeholder="Enter amount">
+                </div>
+                <button id="add-expense-btn" class="btn btn-primary">Add Expense</button>
+            </div>
+            
+            <div class="expense-form">
+                <h2>Set Total Budget</h2>
+                <div class="form-group">
+                    <label for="budget-amount">Budget Amount</label>
+                    <input type="number" id="budget-amount" class="form-control" placeholder="Enter your total budget">
+                </div>
+                <button id="set-budget-btn" class="btn btn-secondary">Set Budget</button>
+            </div>
+            
+            <div class="expense-list">
+                <h2>Your Expenses</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Amount</th>
+                            <th>Date</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="expense-table-body">
+                        <!-- Expenses will be loaded here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
+
+    <script>
+        // Firebase configuration - Replace with your own config
+        const firebaseConfig = {
+            apiKey: "YOUR_API_KEY",
+            authDomain: "YOUR_AUTH_DOMAIN",
+            projectId: "YOUR_PROJECT_ID",
+            storageBucket: "YOUR_STORAGE_BUCKET",
+            messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+            appId: "YOUR_APP_ID"
+        };
+        
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+        
+        // DOM Elements
+        const authSection = document.getElementById('auth-section');
+        const appContent = document.getElementById('app-content');
+        const usernameDisplay = document.getElementById('username-display');
+        const totalBudgetDisplay = document.getElementById('total-budget');
+        const totalExpensesDisplay = document.getElementById('total-expenses');
+        const remainingAmountDisplay = document.getElementById('remaining-amount');
+        const expenseTableBody = document.getElementById('expense-table-body');
+        const alertContainer = document.getElementById('alert-container');
+        
+        // Button Event Listeners
+        document.getElementById('login-btn').addEventListener('click', login);
+        document.getElementById('signup-btn').addEventListener('click', signup);
+        document.getElementById('logout-btn').addEventListener('click', logout);
+        document.getElementById('add-expense-btn').addEventListener('click', addExpense);
+        document.getElementById('set-budget-btn').addEventListener('click', setBudget);
+        
+        // Authentication state observer
+        auth.onAuthStateChanged(user => {
+            if (user) {
+                // User is signed in
+                authSection.classList.add('hidden');
+                appContent.classList.remove('hidden');
+                usernameDisplay.textContent = user.email.split('@')[0];
+                
+                // Load user data
+                loadUserData(user.uid);
+            } else {
+                // User is signed out
+                authSection.classList.remove('hidden');
+                appContent.classList.add('hidden');
+            }
+        });
+        
+        // Authentication Functions
+        function login() {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            
+            if (!email || !password) {
+                showAlert('Please enter both email and password.', 'danger');
+                return;
+            }
+            
+            auth.signInWithEmailAndPassword(email, password)
+                .then((userCredential) => {
+                    showAlert('Logged in successfully!', 'success');
+                })
+                .catch((error) => {
+                    showAlert(`Login failed: ${error.message}`, 'danger');
+                });
+        }
+        
+        function signup() {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            
+            if (!email || !password) {
+                showAlert('Please enter both email and password.', 'danger');
+                return;
+            }
+            
+            if (password.length < 6) {
+                showAlert('Password should be at least 6 characters.', 'danger');
+                return;
+            }
+            
+            auth.createUserWithEmailAndPassword(email, password)
+                .then((userCredential) => {
+                    // Initialize user data in Firestore
+                    db.collection('users').doc(userCredential.user.uid).set({
+                        email: email,
+                        totalBudget: 0,
+                        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                    
+                    showAlert('Account created successfully!', 'success');
+                })
+                .catch((error) => {
+                    showAlert(`Signup failed: ${error.message}`, 'danger');
+                });
+        }
+        
+        function logout() {
+            auth.signOut()
+                .then(() => {
+                    showAlert('Logged out successfully!', 'success');
+                })
+                .catch((error) => {
+                    showAlert(`Logout failed: ${error.message}`, 'danger');
+                });
+        }
+        
+        // Data Functions
+        function loadUserData(userId) {
+            // Load user budget
+            db.collection('users').doc(userId).get()
+                .then((doc) => {
+                    if (doc.exists) {
+                        const userData = doc.data();
+                        updateBudgetDisplay(userData.totalBudget || 0);
+                    }
+                });
+            
+            // Set up real-time listener for expenses
+            db.collection('users').doc(userId).collection('expenses')
+                .orderBy('createdAt', 'desc')
+                .onSnapshot((snapshot) => {
+                    loadExpenses(snapshot);
+                });
+        }
+        
+        function loadExpenses(snapshot) {
+            expenseTableBody.innerHTML = '';
+            
+            let totalExpenses = 0;
+            
+            snapshot.forEach((doc) => {
+                const expense = doc.data();
+                const expenseId = doc.id;
+                
+                const amount = parseFloat(expense.amount);
+                totalExpenses += amount;
+                
+                const row = document.createElement('tr');
+                row.className = 'expense-item';
+                
+                // Format date
+                const date = expense.createdAt ? new Date(expense.createdAt.toDate()) : new Date();
+                const formattedDate = `${date.getMonth() + 1}/${date.getDate()}/${date.getFullYear()}`;
+                
+                row.innerHTML = `
+                    <td>${expense.name}</td>
+                    <td>$${amount.toFixed(2)}</td>
+                    <td>${formattedDate}</td>
+                    <td class="action-buttons">
+                        <button class="btn btn-danger" onclick="deleteExpense('${expenseId}')">Delete</button>
+                    </td>
+                `;
+                
+                expenseTableBody.appendChild(row);
+            });
+            
+            // Update expense totals
+            updateExpenseDisplay(totalExpenses);
+        }
+        
+        function addExpense() {
+            const expenseName = document.getElementById('expense-name').value;
+            const expenseAmount = document.getElementById('expense-amount').value;
+            
+            if (!expenseName || !expenseAmount) {
+                showAlert('Please enter both name and amount.', 'danger');
+                return;
+            }
+            
+            const amount = parseFloat(expenseAmount);
+            if (isNaN(amount) || amount <= 0) {
+                showAlert('Please enter a valid amount.', 'danger');
+                return;
+            }
+            
+            const userId = auth.currentUser.uid;
+            
+            db.collection('users').doc(userId).collection('expenses').add({
+                name: expenseName,
+                amount: amount,
+                createdAt: firebase.firestore.FieldValue.serverTimestamp()
+            })
+            .then(() => {
+                // Clear form
+                document.getElementById('expense-name').value = '';
+                document.getElementById('expense-amount').value = '';
+                
+                showAlert('Expense added successfully!', 'success');
+            })
+            .catch((error) => {
+                showAlert(`Error adding expense: ${error.message}`, 'danger');
+            });
+        }
+        
+        function deleteExpense(expenseId) {
+            const userId = auth.currentUser.uid;
+            
+            db.collection('users').doc(userId).collection('expenses').doc(expenseId).delete()
+                .then(() => {
+                    showAlert('Expense deleted successfully!', 'success');
+                })
+                .catch((error) => {
+                    showAlert(`Error deleting expense: ${error.message}`, 'danger');
+                });
+        }
+        
+        function setBudget() {
+            const budgetAmount = document.getElementById('budget-amount').value;
+            
+            if (!budgetAmount) {
+                showAlert('Please enter a budget amount.', 'danger');
+                return;
+            }
+            
+            const amount = parseFloat(budgetAmount);
+            if (isNaN(amount) || amount < 0) {
+                showAlert('Please enter a valid amount.', 'danger');
+                return;
+            }
+            
+            const userId = auth.currentUser.uid;
+            
+            db.collection('users').doc(userId).update({
+                totalBudget: amount
+            })
+            .then(() => {
+                document.getElementById('budget-amount').value = '';
+                updateBudgetDisplay(amount);
+                showAlert('Budget updated successfully!', 'success');
+            })
+            .catch((error) => {
+                showAlert(`Error updating budget: ${error.message}`, 'danger');
+            });
+        }
+        
+        // UI Update Functions
+        function updateBudgetDisplay(budget) {
+            totalBudgetDisplay.textContent = `$${budget.toFixed(2)}`;
+            updateRemainingAmount();
+        }
+        
+        function updateExpenseDisplay(totalExpenses) {
+            totalExpensesDisplay.textContent = `$${totalExpenses.toFixed(2)}`;
+            updateRemainingAmount();
+        }
+        
+        function updateRemainingAmount() {
+            const budget = parseFloat(totalBudgetDisplay.textContent.replace('$', ''));
+            const expenses = parseFloat(totalExpensesDisplay.textContent.replace('$', ''));
+            const remaining = budget - expenses;
+            
+            remainingAmountDisplay.textContent = `$${remaining.toFixed(2)}`;
+            
+            // Change color based on remaining amount
+            if (remaining < 0) {
+                remainingAmountDisplay.style.color = '#e74c3c';
+            } else {
+                remainingAmountDisplay.style.color = 'white';
+            }
+        }
+        
+        function showAlert(message, type) {
+            const alert = document.createElement('div');
+            alert.className = `alert alert-${type}`;
+            alert.textContent = message;
+            
+            alertContainer.appendChild(alert);
+            
+            // Remove alert after 3 seconds
+            setTimeout(() => {
+                alert.remove();
+            }, 3000);
+        }
+        
+        // Make deleteExpense globally available
+        window.deleteExpense = deleteExpense;
+    </script>
+</body>
+</html>
